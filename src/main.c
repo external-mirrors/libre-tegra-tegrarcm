@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <error.h>
+#include <err.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -499,12 +499,12 @@ int main(int argc, char **argv)
 		// init and create signed query version rcm
 		if (initialize_rcm(devid, NULL, pkc_keyfile, signed_msgs_file,
 					download_signed_msgs))
-			error(1, errno, "error initializing RCM protocol");
+			err(1, "error initializing RCM protocol");
 
 		// create signed download miniloader rcm
 		if (initialize_miniloader(devid, NULL, mlfile, mlentry,
 				signed_msgs_file, download_signed_msgs))
-			error(1, errno, "error initializing miniloader");
+			err(1, "error initializing miniloader");
 
 		// create bl signature
 		sign_blob(blfile, pkc_keyfile, signed_msgs_file);
@@ -519,7 +519,7 @@ int main(int argc, char **argv)
 #endif
 	);
 	if (!usb)
-		error(1, errno, "could not open USB device");
+		err(1, "could not open USB device");
 	printf("device id: 0x%x\n", devid);
 
 	if (!do_read) {
@@ -545,19 +545,19 @@ int main(int argc, char **argv)
 			printf("uid:  0x%016" PRIx64 "%016" PRIx64 "\n",
 			       uid[1], uid[0]);
 		else
-			error(1, errno, "USB read truncated");
+			err(1, "USB read truncated");
 
 		// initialize rcm
 		ret2 = initialize_rcm(devid, usb, pkc_keyfile,
 					signed_msgs_file, download_signed_msgs);
 		if (ret2)
-			error(1, errno, "error initializing RCM protocol");
+			err(1, "error initializing RCM protocol");
 
 		// download the miniloader to start nv3p or create ml rcm file
 		ret2 = initialize_miniloader(devid, usb, mlfile, mlentry,
 					signed_msgs_file, download_signed_msgs);
 		if (ret2)
-			error(1, errno, "error initializing miniloader");
+			err(1, "error initializing miniloader");
 
 		// device may have re-enumerated, so reopen USB
 		usb_close(usb);
@@ -568,20 +568,20 @@ int main(int argc, char **argv)
 #endif
 		);
 		if (!usb)
-			error(1, errno, "could not open USB device");
+			err(1, "could not open USB device");
 	}
 
 	// now that miniloader is up, start nv3p protocol
 	ret = nv3p_open(&h3p, usb);
 	if (ret)
-		error(1, errno, "3p open failed");
+		err(1, "3p open failed");
 
 	// read the BCT
 	if (do_read) {
 		printf("reading BCT from system, writing to %s...", bctfile);
 		ret = read_bct(h3p, bctfile);
 		if (ret)
-			error(1, errno, "error reading bct");
+			err(1, "error reading bct");
 		printf("done!\n");
 		exit(0);
 	}
@@ -589,10 +589,10 @@ int main(int argc, char **argv)
 	// get platform info and dump it
 	ret = nv3p_cmd_send(h3p, NV3P_CMD_GET_PLATFORM_INFO, (uint8_t *)&info);
 	if (ret)
-		error(1, errno, "retrieving platform info");
+		err(1, "retrieving platform info");
 	ret = wait_status(h3p);
 	if (ret)
-		error(1, errno, "wait status after platform info");
+		err(1, "wait status after platform info");
 	dump_platform_info(&info);
 	set_platform_info(&info);
 
@@ -601,20 +601,20 @@ int main(int argc, char **argv)
 	    info.op_mode != RCM_OP_MODE_ODM_SECURE &&
 	    info.op_mode != RCM_OP_MODE_ODM_SECURE_PKC &&
 	    info.op_mode != RCM_OP_MODE_PRE_PRODUCTION)
-		error(1, ENODEV, "device is not in developer, open, secure, "
+		err(1, "device is not in developer, open, secure, "
 		      "or pre-production mode, cannot flash");
 
 	// download the BCT
 	ret = download_bct(h3p, bctfile);
 	if (ret) {
-		error(1, ret, "error downloading bct: %s", bctfile);
+		err(1, "error downloading bct: %s", bctfile);
 	}
 
 	// download the bootloader
 	ret = download_bootloader(h3p, blfile, entryaddr, loadaddr,
 				pkc_keyfile, signed_msgs_file);
 	if (ret)
-		error(1, ret, "error downloading bootloader: %s", blfile);
+		err(1, "error downloading bootloader: %s", blfile);
 
 	nv3p_close(h3p);
 	usb_close(usb);
@@ -1158,7 +1158,7 @@ static int download_bct(nv3p_handle_t h3p, char *filename)
 
 	ret = wait_status(h3p);
 	if (ret)
-		error(1, errno, "wait status after sending bct");
+		err(1, "wait status after sending bct");
 
 	return 0;
 }
