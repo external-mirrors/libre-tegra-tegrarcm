@@ -148,7 +148,7 @@ static void usage(char *progname)
 	fprintf(stderr, "\t\tPrint version information and exit\n");
 	fprintf(stderr, "\t--miniloader=mlfile\n");
 	fprintf(stderr, "\t\tRead the miniloader from file instead of using built-in\n");
-	fprintf(stderr, "\t\tminiloader\n");
+	fprintf(stderr, "\t\tminiloader, required for SBK secured devices.\n");
 	fprintf(stderr, "\t--miniloader_entry=<mlentry>\n");
 	fprintf(stderr, "\t\tSpecify the entry point for the miniloader\n");
 	fprintf(stderr, "\t--sbk=<SBK>\n");
@@ -457,6 +457,15 @@ int main(int argc, char **argv)
 	/* specify bct file if no sign_msgs option */
 	if ((bctfile == NULL) && (sign_msgs == false)) {
 		fprintf(stderr, "BCT file must be specified\n");
+		usage(argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	/* when specifying sbk for secured devices we need to provide
+	 * a miniloader as builtin one doesn't handle it well
+	 */
+	if (mlfile == NULL && rcm_sbk != NULL) {
+		fprintf(stderr, "Miniloader file must be specified for SBK secure devices\n");
 		usage(argv[0]);
 		exit(EXIT_FAILURE);
 	}
