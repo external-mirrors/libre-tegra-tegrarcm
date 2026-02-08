@@ -101,7 +101,7 @@ extern "C" int rsa_pss_sign(const char *key_file, const uint8_t *msg,
 		// error check
 		if (mod.ByteCount() != RCM_RSA_MODULUS_SIZE)
 			throw std::length_error("incorrect rsa key modulus length");
-		for (int i = 0; i < mod.ByteCount(); i++)
+		for (unsigned int i = 0; i < mod.ByteCount(); i++)
 			modulus_buf[i] = mod.GetByte(i);
 
 		// Sign the message
@@ -112,7 +112,7 @@ extern "C" int rsa_pss_sign(const char *key_file, const uint8_t *msg,
 		length = signer.SignMessage(rng, msg, len, signature);
 
 		// Copy in reverse order
-		for (int i = 0; i < length; i++)
+		for (size_t i = 0; i < length; i++)
 			sig_buf[length - i - 1] = signature[i];
 	}
 	catch(const CryptoPP::Exception& e) {
