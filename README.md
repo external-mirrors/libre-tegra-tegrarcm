@@ -80,7 +80,7 @@ Submitting Changes
 ==================
 
 To submit patches to this project continuation, please made a pull request
-to a repository found here https://gitlab.com/grate-driver/tegrarcm
+to a repository found here https://codeberg.org/libre-tegra/tegrarcm
 
 Patches should be signed off (include a signed-off-by line) to indicate your
 acceptance of the code's license (see COPYING and the license header in each
