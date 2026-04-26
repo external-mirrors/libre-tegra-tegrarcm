@@ -85,6 +85,8 @@ struct aes_cbc_state_struct {
 	};
 };
 
+const static uint8_t SBK_ZEROES[AES::DEFAULT_KEYLENGTH] = {};
+
 extern "C" int cmac_hash(const uint8_t *msg, uint32_t len, uint8_t *cmac_buf, const uint8_t *sbk)
 {
 	string plain(reinterpret_cast<const char*>(msg), len);
@@ -96,6 +98,8 @@ extern "C" int cmac_hash(const uint8_t *msg, uint32_t len, uint8_t *cmac_buf, co
 	}
 
 	try {
+		if (!sbk) 
+			sbk = SBK_ZEROES;
 		CMAC<AES> cmac(sbk, AES::DEFAULT_KEYLENGTH);
 
 		StringSource(plain, true,
